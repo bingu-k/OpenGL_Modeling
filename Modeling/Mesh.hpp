@@ -31,8 +31,8 @@ public:
     std::vector<GLuint>   _indices;
     std::vector<Texture>  _textures;
 
-	Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
-
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
+    // ~Mesh() <- 이거 만들어서 GL_INVAILED_OPERATION 뜸
     void    Draw(Shader& shader);
 private:
     GLuint  VAO, VBO, EBO;
