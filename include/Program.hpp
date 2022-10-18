@@ -14,7 +14,7 @@ public:
 
     void    CreatePlane(void);
 
-    void    addTexture(const Texture& texture)
+    void    addTexture(const Texture* texture)
     { textures.push_back(texture); };
     void    addObject(const Object& object)
     { objects.push_back(object); };
@@ -28,7 +28,7 @@ public:
     ~Program();
 private:
     GLuint                  id { 0 };
-    std::vector<Texture>    textures {};
+    std::vector<Texture*>    textures {};
     std::vector<Object>     objects {};
 
     Program() {};

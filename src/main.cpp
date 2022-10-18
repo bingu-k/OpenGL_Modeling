@@ -14,30 +14,23 @@ void    key_manager(GLFWwindow *window)
 GLFWwindow* init_window(unsigned int width, unsigned int height)
 {
     if (!glfwInit())
-    {
         throw string("Error: Failed to initialize GLFW");
-    }
-    glfwWindowHint(GLFW_SAMPLES, 4); // 안티엘리어싱 x4
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // 최대버전: 그냥 glfw 버전
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6); // 최소버전: 그냥 glfw 버전
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 프로파일 버전: 코어
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
 
     GLFWwindow* window = glfwCreateWindow(width, height, WINDOW_NAME, nullptr, nullptr);
     if (window == NULL)
-    {
         throw string("Error: Failed to create GLFW window");
-    }
     glfwMakeContextCurrent(window);
 
-    // OpenGL 함수 포인터와 실제 함수를 매핑
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
         throw string("Error: Failed to initialize GLAD");
-    }
-    return window;
+    return (window);
 };
 
 int main_process()
@@ -49,9 +42,7 @@ int main_process()
     program->CreatePlane();
 
     // 텍스처
-    Texture texture = Texture();
-    texture.Load(".\\image\\lenna.png", "texture_id");
-    program->addTexture(texture);
+    program->addTexture(Texture::Load("./image/lenna.png", "texture_id")->get());
 
     // 렌더링 루프
     while (!glfwWindowShouldClose(window))

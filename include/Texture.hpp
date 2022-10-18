@@ -6,22 +6,32 @@
 class Texture
 {
 public:
-    Texture();
+    std::shared_ptr<Texture>    Load(const std::filesystem::path& filePath,
+                                    std::string name);
 
-    void    Load(const std::filesystem::path& filePath, std::string name);
     const GLuint&       Get(void) const
     { return (this->id); };
     const std::string&  GetName(void) const
     { return (this->name); };
 private:
     GLuint      id { 0 };
-    std::string name;
+    std::string name { "" };
 
+    Texture() {};
+    void    init(void);
+    void    LoadFile(const std::filesystem::path& filePath, std::string name);
     void    SetWrap(GLuint wrapS, GLuint wrapT);
     void    SetFliter(GLuint filterMin, GLuint filterMag);
 };
 
-Texture::Texture()
+std::shared_ptr<Texture>    Texture::Load(const std::filesystem::path& filePath, std::string name)
+{
+    std::shared_ptr<Texture>    texture = std::shared_ptr<Texture>(Texture());
+    texture->init();
+    texture->LoadFile(path, name);
+};
+
+void    Texture::init()
 {
     glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &this->id);
     SetWrap(GL_REPEAT, GL_REPEAT);
@@ -29,7 +39,7 @@ Texture::Texture()
     stbi_set_flip_vertically_on_load(true);
 };
 
-void    Texture::Load(const std::filesystem::path& filePath, std::string name)
+void    Texture::LoadFile(const std::filesystem::path& filePath, std::string name)
 {
     this->name = name;
     int width, height, channel;
