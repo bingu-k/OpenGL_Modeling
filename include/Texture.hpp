@@ -2,17 +2,19 @@
 #define TEXTURE_HPP
 
 #include "Common.hpp"
+#include "Program.hpp"
 
 class Texture
 {
 public:
-    std::shared_ptr<Texture>    Load(const std::filesystem::path& filePath,
-                                    std::string name);
+    static std::unique_ptr<Texture>    Load(const std::filesystem::path& filePath,
+                                    		std::string name);
 
     const GLuint&       Get(void) const
     { return (this->id); };
     const std::string&  GetName(void) const
     { return (this->name); };
+	void	bind(const GLuint& programID, unsigned int idx);
 private:
     GLuint      id { 0 };
     std::string name { "" };
@@ -24,16 +26,26 @@ private:
     void    SetFliter(GLuint filterMin, GLuint filterMag);
 };
 
-std::shared_ptr<Texture>    Texture::Load(const std::filesystem::path& filePath, std::string name)
+std::unique_ptr<Texture>    Texture::Load(const std::filesystem::path& filePath, std::string name)
 {
-    std::shared_ptr<Texture>    texture = std::shared_ptr<Texture>(Texture());
+    std::unique_ptr<Texture>	texture = std::unique_ptr<Texture>(new Texture());
     texture->init();
-    texture->LoadFile(path, name);
+    texture->LoadFile(filePath, name);
+	return (std::move(texture));
+};
+
+void	Texture::bind(const GLuint& programID, unsigned int idx)
+{
+	glActiveTexture(GL_TEXTURE0 + idx);
+	glBindTexture(GL_TEXTURE_2D, this->id);
+	glUniform1i(glGetUniformLocation(programID, this->name.c_str()), idx);
 };
 
 void    Texture::init()
 {
-    glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &this->id);
+	glGenTextures(1, &this->id);
+	glBindTexture(GL_TEXTURE_2D, this->id);
+    // glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &this->id);
     SetWrap(GL_REPEAT, GL_REPEAT);
     SetFliter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
     stbi_set_flip_vertically_on_load(true);

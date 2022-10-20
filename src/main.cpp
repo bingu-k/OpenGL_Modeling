@@ -37,12 +37,14 @@ int main_process()
 {
     GLFWwindow* window = init_window(800, 600);
     
-    std::unique_ptr<Program>    program = Program::Create(".\\shader\\shader.vs"
-                                                        , ".\\shader\\shader.fs");
-    program->CreatePlane();
+	std::cout << std::filesystem::current_path() << std::endl;
+    std::unique_ptr<Program>    program = Program::Create("./shader/shader.vert"
+                                                        , "./shader/shader.frag");
+	// Object
+	std::unique_ptr<Object>		plane = Object::CreatePlane();
 
-    // 텍스처
-    program->addTexture(Texture::Load("./image/lenna.png", "texture_id")->get());
+    // Texture
+	std::unique_ptr<Texture>	texture = Texture::Load("./image/lenna.png", "textrue_id");
 
     // 렌더링 루프
     while (!glfwWindowShouldClose(window))
@@ -53,6 +55,8 @@ int main_process()
         glClear(GL_COLOR_BUFFER_BIT);
         
         program->Rendering();
+		texture->bind(program->Get(), 0);
+		plane->Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

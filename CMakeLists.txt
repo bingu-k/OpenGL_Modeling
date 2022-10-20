@@ -91,8 +91,13 @@ target_link_directories(${PROJECT_NAME} PUBLIC
     ${DEP_LIB_DIR}
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    ${DEP_LIBS}
+	${DEP_LIBS}
 )
+if (APPLE)
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		"-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo"
+	)
+endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
     WINDOW_NAME="${PROJECT_NAME}"

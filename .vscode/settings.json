@@ -1,4 +1,7 @@
 {
+	"cmake.debugConfig": {
+		"cwd": "${workspaceFolder}"
+	},
     "cmake.configureOnOpen": true,
     "files.associations": {
         "__bit_reference": "cpp",

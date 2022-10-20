@@ -12,13 +12,6 @@ public:
     static std::unique_ptr<Program> Create(const std::filesystem::path& vertexShaderPath
                                         , const std::filesystem::path& fragmentShaderPath);
 
-    void    CreatePlane(void);
-
-    void    addTexture(const Texture* texture)
-    { textures.push_back(texture); };
-    void    addObject(const Object& object)
-    { objects.push_back(object); };
-
     void    Rendering(void);
 
     const GLuint&   Get(void) const
@@ -28,8 +21,6 @@ public:
     ~Program();
 private:
     GLuint                  id { 0 };
-    std::vector<Texture*>    textures {};
-    std::vector<Object>     objects {};
 
     Program() {};
     void    init(const std::filesystem::path& vertexShaderPath
@@ -38,11 +29,7 @@ private:
 };
 
 Program::~Program()
-{
-    textures.clear();
-    objects.clear();
-    glDeleteProgram(this->id);
-};
+{ glDeleteProgram(this->id); };
 
 std::unique_ptr<Program> Program::Create(const std::filesystem::path& vertexShaderPath
                                         , const std::filesystem::path& fragmentShaderPath)
@@ -52,14 +39,6 @@ std::unique_ptr<Program> Program::Create(const std::filesystem::path& vertexShad
     return (std::move(program));
 };
 
-void    Program::CreatePlane(void)
-{
-    Object  object;
-
-    object.CreatePlane();
-    addObject(object);
-};
-
 void    Program::Rendering(void)
 {
     static GLfloat  foo = 0.0f;
@@ -67,17 +46,6 @@ void    Program::Rendering(void)
     Use();
     foo += 0.01f;
     glUniform1f(glGetUniformLocation(this->id, "foo"), sinf(foo));
-
-    // 텍스처 바인딩
-    for (unsigned int idx = 0; idx < textures.size(); ++idx)
-    {
-        glActiveTexture(GL_TEXTURE0 + idx);
-        glBindTexture(GL_TEXTURE_2D, textures.at(idx).Get());
-        glUniform1i(glGetUniformLocation(this->id, textures.at(idx).GetName().c_str()), 0);
-    }
-    // 그리기
-    for (unsigned int idx = 0; idx < objects.size(); ++idx)
-        objects.at(idx).Draw();
 };
 
 void    Program::init(const std::filesystem::path& vertexShaderPath

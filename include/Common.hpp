@@ -19,7 +19,7 @@
 
 std::string file_loader(const std::filesystem::path& filePath)
 {
-    std::ifstream       ifs(filePath);
+    std::ifstream       ifs(filePath.c_str());
     std::stringstream   ss;
 
     if (!ifs.is_open())
