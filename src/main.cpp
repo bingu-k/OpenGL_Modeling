@@ -37,7 +37,6 @@ int main_process()
 {
     GLFWwindow* window = init_window(800, 600);
     
-	std::cout << std::filesystem::current_path() << std::endl;
     std::unique_ptr<Program>    program = Program::Create("./shader/shader.vert"
                                                         , "./shader/shader.frag");
 	// Object
