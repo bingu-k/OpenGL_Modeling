@@ -14,6 +14,7 @@ class Object
 {
 public:
 	static std::unique_ptr<Object>	CreatePlane(void);
+	static std::unique_ptr<Object>	CreateBox(void);
 
     ~Object();
     void    Draw(void);
@@ -49,6 +50,52 @@ std::unique_ptr<Object>	Object::CreatePlane(void)
     std::vector<GLuint> indices = {
         0, 1, 3,
         1, 2, 3
+    };
+	std::unique_ptr<Object>	plane = std::unique_ptr<Object>(new Object());
+	plane->init(vertices, indices);
+	return (std::move(plane));
+};
+
+std::unique_ptr<Object>	Object::CreateBox(void)
+{
+    std::vector<Vertex> vertices = {
+        {{ -0.5f, -0.5f, -0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 0.0f}},
+        {{  0.5f, -0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 0.0f}},
+        {{  0.5f,  0.5f, -0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 1.0f}},
+        {{ -0.5f,  0.5f, -0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 1.0f}},
+
+        {{ -0.5f, -0.5f,  0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 0.0f}},
+        {{  0.5f, -0.5f,  0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 0.0f}},
+        {{  0.5f,  0.5f,  0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 1.0f}},
+        {{ -0.5f,  0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 1.0f}},
+
+        {{ -0.5f,  0.5f,  0.5f}, {0.8f, 0.4f, 0.3f}, {1.0f, 0.0f}},
+        {{ -0.5f,  0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
+        {{ -0.5f, -0.5f, -0.5f}, {0.2f, 0.4f, 0.3f}, {0.0f, 1.0f}},
+        {{ -0.5f, -0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}},
+        
+        {{  0.5f,  0.5f,  0.5f}, {0.8f, 0.4f, 0.3f}, {1.0f, 0.0f}},
+        {{  0.5f,  0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
+        {{  0.5f, -0.5f, -0.5f}, {0.2f, 0.4f, 0.3f}, {0.0f, 1.0f}},
+        {{  0.5f, -0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}},
+        
+        {{ -0.5f, -0.5f, -0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 1.0f}},
+        {{  0.5f, -0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
+        {{  0.5f, -0.5f,  0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 0.0f}},
+        {{ -0.5f, -0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}},
+        
+        {{ -0.5f,  0.5f, -0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 1.0f}},
+        {{  0.5f,  0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
+        {{  0.5f,  0.5f,  0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 0.0f}},
+        {{ -0.5f,  0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}}
+    };
+    std::vector<GLuint> indices = {
+        0,  2,  1,  2,  0,  3,
+        4,  5,  6,  6,  7,  4,
+        8,  9, 10, 10, 11,  8,
+        12, 14, 13, 14, 12, 15,
+        16, 17, 18, 18, 19, 16,
+        20, 22, 21, 22, 20, 23
     };
 	std::unique_ptr<Object>	plane = std::unique_ptr<Object>(new Object());
 	plane->init(vertices, indices);

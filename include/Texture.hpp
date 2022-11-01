@@ -14,7 +14,7 @@ public:
     { return (this->id); };
     const std::string&  GetName(void) const
     { return (this->name); };
-	void	bind(const GLuint& programID, unsigned int idx);
+	void	bind(unsigned int idx);
 private:
     GLuint      id { 0 };
     std::string name { "" };
@@ -34,18 +34,16 @@ std::unique_ptr<Texture>    Texture::Load(const std::filesystem::path& filePath,
 	return (std::move(texture));
 };
 
-void	Texture::bind(const GLuint& programID, unsigned int idx)
+void	Texture::bind(unsigned int idx)
 {
 	glActiveTexture(GL_TEXTURE0 + idx);
 	glBindTexture(GL_TEXTURE_2D, this->id);
-	glUniform1i(glGetUniformLocation(programID, this->name.c_str()), idx);
 };
 
 void    Texture::init()
 {
 	glGenTextures(1, &this->id);
 	glBindTexture(GL_TEXTURE_2D, this->id);
-    // glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &this->id);
     SetWrap(GL_REPEAT, GL_REPEAT);
     SetFliter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
     stbi_set_flip_vertically_on_load(true);

@@ -19,6 +19,19 @@ public:
     void    Use(void)
     { glUseProgram(this->id); };
     ~Program();
+
+    void    setUniform(const int& value, const std::string& name)
+    { glUniform1i(glGetUniformLocation(this->id, name.c_str()), value); };
+    void    setUniform(const float& value, const std::string& name)
+    { glUniform1f(glGetUniformLocation(this->id, name.c_str()), value); };
+    void    setUniform(const glm::vec2& value, const std::string& name)
+    { glUniform2fv(glGetUniformLocation(this->id, name.c_str()), 1, glm::value_ptr(value)); };
+    void    setUniform(const glm::vec3& value, const std::string& name)
+    { glUniform3fv(glGetUniformLocation(this->id, name.c_str()), 1, glm::value_ptr(value)); };
+    void    setUniform(const glm::vec4& value, const std::string& name)
+    { glUniform4fv(glGetUniformLocation(this->id, name.c_str()), 1, glm::value_ptr(value)); };
+    void    setUniform(const glm::mat4& value, const std::string& name)
+    { glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value)); };
 private:
     GLuint                  id { 0 };
 
@@ -43,9 +56,9 @@ void    Program::Rendering(void)
 {
     static GLfloat  foo = 0.0f;
     
-    Use();
+    this->Use();
     foo += 0.01f;
-    glUniform1f(glGetUniformLocation(this->id, "foo"), sinf(foo));
+    this->setUniform(sinf(foo), "foo");
 };
 
 void    Program::init(const std::filesystem::path& vertexShaderPath
