@@ -1,6 +1,7 @@
 #include "../include/Common.hpp"
 #include "../include/Program.hpp"
 #include "../include/Texture.hpp"
+#include "../include/Camera.hpp"
 #include "../include/Object.hpp"
 #include "../include/MathOP.hpp"
 
@@ -11,25 +12,18 @@ void    framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 };
 
+void    key_manager(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    auto	camera = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
+    camera->moveCamera(window);
+};
+
 void    mouse_callback(GLFWwindow* window, double xPos, double yPos)
 {
-    float   xDelta = xPos - prevXPos;
-    float   yDelta = prevYPos - yPos;
-    prevXPos = xPos;
-    prevYPos = yPos;
-
-    const float sensitivity = 0.1f;
-    xDelta *= sensitivity;
-    yDelta *= sensitivity;
-
-    yaw += xDelta;
-    pitch += yDelta;
-
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    else if (pitch < -89.0f)
-        pitch = -89.0f;
-    updateCamera();
+    auto	camera = reinterpret_cast<Camera*>(glfwGetWindowUserPointer(window));
+    camera->turnCamera(xPos, yPos);
 };
 
 GLFWwindow* init_window(void)
@@ -71,7 +65,12 @@ int main_process()
     // Texture
 	std::unique_ptr<Texture>	texture = Texture::Load("./image/lenna.png", "textrue_id");
 
-    updateCamera();
+    // Camera
+    double  x, y;
+    glfwGetCursorPos(window, &x, &y);
+    std::unique_ptr<Camera>     camera = Camera::Create(x, y);
+	glfwSetWindowUserPointer(window, camera.get());
+
     // 렌더링 루프
     while (!glfwWindowShouldClose(window))
     {
@@ -83,14 +82,13 @@ int main_process()
 		texture->bind(0);
 
         GLfloat     angle = glfwGetTime();
-        glm::mat4   projection = MathOP::perspective(glm::radians(45.0f), width/height, 0.01f, 50.0f);
-        glm::mat4   view = MathOP::lookAt(pos, pos + front, up);
+        glm::mat4   view = camera->getView(width / height);
         glm::mat4   model = MathOP::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
         model = MathOP::rotate(model, angle, glm::vec3(1.0f, 0.5f, 0.3f));
         
         program->Rendering();
         program->setUniform(0, texture->GetName());
-        program->setUniform(projection * view * model, "transform");
+        program->setUniform(view * model, "transform");
 		box->Draw();
 
         glfwSwapBuffers(window);
