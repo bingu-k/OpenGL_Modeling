@@ -6,7 +6,7 @@
 struct Vertex
 {
     glm::vec3 position;
-    glm::vec3 color;
+    glm::vec3 normal;
     glm::vec2 texture_coord;
 };
 
@@ -42,10 +42,10 @@ Object::~Object()
 std::unique_ptr<Object>	Object::CreatePlane(void)
 {
     std::vector<Vertex> vertices = {
-        {{ 0.5f,  0.5f,  0.0f}, {0.8f, 0.4f, 0.3f}, {1.0f, 1.0f}},
-        {{ 0.5f, -0.5f,  0.0f}, {0.1f, 0.2f, 0.4f}, {1.0f, 0.0f}},
-        {{-0.5f, -0.5f,  0.0f}, {0.2f, 0.4f, 0.3f}, {0.0f, 0.0f}},
-        {{-0.5f,  0.5f,  0.0f}, {0.8f, 0.6f, 0.2f}, {0.0f, 1.0f}},
+        {{ 0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+        {{ 0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+        {{-0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{-0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
     };
     std::vector<GLuint> indices = {
         0, 1, 3,
@@ -59,35 +59,35 @@ std::unique_ptr<Object>	Object::CreatePlane(void)
 std::unique_ptr<Object>	Object::CreateBox(void)
 {
     std::vector<Vertex> vertices = {
-        {{ -0.5f, -0.5f, -0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 0.0f}},
-        {{  0.5f, -0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 0.0f}},
-        {{  0.5f,  0.5f, -0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 1.0f}},
-        {{ -0.5f,  0.5f, -0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 1.0f}},
+        {{ -0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},
+        {{  0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}},
+        {{  0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}},
+        {{ -0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}},
 
-        {{ -0.5f, -0.5f,  0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 0.0f}},
-        {{  0.5f, -0.5f,  0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 0.0f}},
-        {{  0.5f,  0.5f,  0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 1.0f}},
-        {{ -0.5f,  0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 1.0f}},
+        {{ -0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{  0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+        {{  0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+        {{ -0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
 
-        {{ -0.5f,  0.5f,  0.5f}, {0.8f, 0.4f, 0.3f}, {1.0f, 0.0f}},
-        {{ -0.5f,  0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
-        {{ -0.5f, -0.5f, -0.5f}, {0.2f, 0.4f, 0.3f}, {0.0f, 1.0f}},
-        {{ -0.5f, -0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}},
+        {{ -0.5f,  0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{ -0.5f,  0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ -0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+        {{ -0.5f, -0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
         
-        {{  0.5f,  0.5f,  0.5f}, {0.8f, 0.4f, 0.3f}, {1.0f, 0.0f}},
-        {{  0.5f,  0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
-        {{  0.5f, -0.5f, -0.5f}, {0.2f, 0.4f, 0.3f}, {0.0f, 1.0f}},
-        {{  0.5f, -0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}},
+        {{  0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{  0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
+        {{  0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+        {{  0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
         
-        {{ -0.5f, -0.5f, -0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 1.0f}},
-        {{  0.5f, -0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
-        {{  0.5f, -0.5f,  0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 0.0f}},
-        {{ -0.5f, -0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}},
+        {{ -0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
+        {{  0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{  0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+        {{ -0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
         
-        {{ -0.5f,  0.5f, -0.5f}, {0.8f, 0.4f, 0.3f}, {0.0f, 1.0f}},
-        {{  0.5f,  0.5f, -0.5f}, {0.1f, 0.2f, 0.4f}, {1.0f, 1.0f}},
-        {{  0.5f,  0.5f,  0.5f}, {0.2f, 0.4f, 0.3f}, {1.0f, 0.0f}},
-        {{ -0.5f,  0.5f,  0.5f}, {0.8f, 0.6f, 0.2f}, {0.0f, 0.0f}}
+        {{ -0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
+        {{  0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{  0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+        {{ -0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}}
     };
     std::vector<GLuint> indices = {
         0,  2,  1,  2,  0,  3,
@@ -115,7 +115,7 @@ void	Object::init(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
     BindBuffer(GL_ARRAY_BUFFER, this->VBO, sizeof(Vertex) * vertices.size(), vertices.data());
 
 	SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coord));
 
     BindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO, sizeof(GLuint) * indices.size(), indices.data());

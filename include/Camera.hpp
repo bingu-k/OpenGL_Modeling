@@ -16,6 +16,8 @@ public:
     void    turnCamera(const float& xPos, const float& yPos);
     void    moveCamera(GLFWwindow *window);
     glm::mat4   getView(const float& aspect, const float& fov = 45.0f, const float& near = 0.1f, const float& far = 50.0f);
+    glm::vec3   getPosition(void) { return (this->pos); };
+    glm::vec3   getFront(void) { return (this->front); };
 private:
     glm::vec3   pos{0.0f, 0.0f, 3.0f}, worldUp{0.0f, 1.0f, 0.0f}, front{0.0f, 0.0f, -1.0f}, up{worldUp};
     float       prevXPos, prevYPos, yaw{-90.0f}, pitch{0.0f};
@@ -59,7 +61,6 @@ void    Camera::turnCamera(const float& xPos, const float& yPos)
     float   xDelta = xPos - prevXPos;
     float   yDelta = prevYPos - yPos;
 
-    std::cout << xDelta << "\t" << yDelta << std::endl;
     const float sensitivity = 0.1f;
     xDelta *= sensitivity;
     yDelta *= sensitivity;

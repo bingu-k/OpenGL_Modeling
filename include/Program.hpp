@@ -20,6 +20,8 @@ public:
     { glUseProgram(this->id); };
     ~Program();
 
+    void    setUniform(bool value, const std::string& name)
+    { glUniform1i(glGetUniformLocation(this->id, name.c_str()), value); };
     void    setUniform(const int& value, const std::string& name)
     { glUniform1i(glGetUniformLocation(this->id, name.c_str()), value); };
     void    setUniform(const float& value, const std::string& name)
@@ -50,15 +52,6 @@ std::unique_ptr<Program> Program::Create(const std::filesystem::path& vertexShad
     std::unique_ptr<Program>    program = std::unique_ptr<Program>(new Program());
     program->init(vertexShaderPath, fragmentShaderPath);
     return (std::move(program));
-};
-
-void    Program::Rendering(void)
-{
-    static GLfloat  foo = 0.0f;
-    
-    this->Use();
-    foo += 0.01f;
-    this->setUniform(sinf(foo), "foo");
 };
 
 void    Program::init(const std::filesystem::path& vertexShaderPath
