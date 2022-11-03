@@ -5,10 +5,14 @@
 
 struct Vertex
 {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texture_coord;
+    glm::vec3   position;
+    glm::vec3   normal;
+    glm::vec2   texture_coord;
+    glm::vec3   tangent;
+    glm::vec3   bitangent;
 };
+
+void        CalTangentSpace(std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 
 class Object
 {
@@ -42,52 +46,53 @@ Object::~Object()
 std::unique_ptr<Object>	Object::CreatePlane(void)
 {
     std::vector<Vertex> vertices = {
-        {{ 0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-        {{ 0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-        {{-0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{-0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{ 0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}, {}},
+        {{ 0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {}},
+        {{-0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {}},
+        {{-0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {}},
     };
     std::vector<GLuint> indices = {
         0, 1, 3,
         1, 2, 3
     };
 	std::unique_ptr<Object>	plane = std::unique_ptr<Object>(new Object());
-	plane->init(vertices, indices);
+    CalTangentSpace(vertices, indices);
+    plane->init(vertices, indices);
 	return (std::move(plane));
 };
 
 std::unique_ptr<Object>	Object::CreateBox(void)
 {
     std::vector<Vertex> vertices = {
-        {{ -0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},
-        {{  0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}},
-        {{  0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}},
-        {{ -0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}},
+        {{ -0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}, {}},
+        {{  0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}, {}},
+        {{  0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}, {}},
+        {{ -0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}, {}},
 
-        {{ -0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{  0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-        {{  0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-        {{ -0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{ -0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {}},
+        {{  0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {}},
+        {{  0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}, {}},
+        {{ -0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {}},
 
-        {{ -0.5f,  0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{ -0.5f,  0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
-        {{ -0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
-        {{ -0.5f, -0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+        {{ -0.5f,  0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {}},
+        {{ -0.5f,  0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {}},
+        {{ -0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {}},
+        {{ -0.5f, -0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {}},
         
-        {{  0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{  0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
-        {{  0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
-        {{  0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+        {{  0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {}},
+        {{  0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {}},
+        {{  0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {}},
+        {{  0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {}},
         
-        {{ -0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
-        {{  0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
-        {{  0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
-        {{ -0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+        {{ -0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}, {}},
+        {{  0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}, {}},
+        {{  0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {}},
+        {{ -0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, {}},
         
-        {{ -0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
-        {{  0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
-        {{  0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-        {{ -0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}}
+        {{ -0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}, {}},
+        {{  0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}, {}},
+        {{  0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}, {}},
+        {{ -0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {}}
     };
     std::vector<GLuint> indices = {
         0,  2,  1,  2,  0,  3,
@@ -97,8 +102,10 @@ std::unique_ptr<Object>	Object::CreateBox(void)
         16, 17, 18, 18, 19, 16,
         20, 22, 21, 22, 20, 23
     };
+
 	std::unique_ptr<Object>	plane = std::unique_ptr<Object>(new Object());
-	plane->init(vertices, indices);
+    CalTangentSpace(vertices, indices);
+    plane->init(vertices, indices);
 	return (std::move(plane));
 };
 
@@ -117,16 +124,11 @@ void	Object::init(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
 	SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coord));
+	SetAttrib(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
     BindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO, sizeof(GLuint) * indices.size(), indices.data());
     
     glBindVertexArray(0);
-};
-
-void    Object::Draw(void)
-{
-    glBindVertexArray(this->VAO);
-    glDrawElements(GL_TRIANGLES, this->indexSize, GL_UNSIGNED_INT, nullptr);
 };
 
 void    Object::BindBuffer(GLenum type, GLuint id, size_t dataSize, const void* data)
@@ -139,6 +141,46 @@ void    Object::SetAttrib(GLuint idx, GLint size, GLenum type, GLboolean normali
 {
     glEnableVertexAttribArray(idx);
 	glVertexAttribPointer(idx, size, type, normalized, stride, pointer);
+};
+
+void    Object::Draw(void)
+{
+    glBindVertexArray(this->VAO);
+    glDrawElements(GL_TRIANGLES, this->indexSize, GL_UNSIGNED_INT, nullptr);
+};
+
+glm::vec3   ComputeTangentSpace(std::vector<Vertex>& vertices, GLuint i, GLuint j, GLuint k)
+{
+    glm::vec3   edge1 = vertices[j].position - vertices[i].position;
+    glm::vec3   edge2 = vertices[k].position - vertices[i].position;
+    glm::vec2   uv1 = vertices[j].texture_coord - vertices[i].texture_coord;
+    glm::vec2   uv2 = vertices[k].texture_coord - vertices[i].texture_coord;
+    float       det = uv1.x * uv2.y - uv1.y * uv2.x;
+
+    if (det != 0.0f)
+    {
+        float   invDet = 1.0f / det;
+        return (invDet * (uv2.y * edge1 - uv1.y * edge2));
+    }
+    else
+        return (glm::vec3(0.0f, 0.0f, 0.0f));
+};
+
+
+void    CalTangentSpace(std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
+{
+    std::vector<glm::vec3>  tangents;
+    tangents.resize(vertices.size());
+    memset(tangents.data(), 0, tangents.size() * sizeof(glm::vec3));
+    for (size_t i = 0; i < indices.size(); i += 3)
+    {
+        tangents[indices[i]] += ComputeTangentSpace(vertices, indices[i], indices[i + 1], indices[i + 2]);
+        tangents[indices[i + 1]] += ComputeTangentSpace(vertices, indices[i + 1], indices[i + 2], indices[i]);
+        tangents[indices[i + 2]] += ComputeTangentSpace(vertices, indices[i + 2], indices[i], indices[i + 1]);
+    }
+
+    for (size_t i = 0; i < vertices.size(); ++i)
+        vertices[i].tangent = glm::normalize(tangents[i]);
 };
 
 #endif

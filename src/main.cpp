@@ -58,19 +58,17 @@ int main_process()
     GLFWwindow* window = init_window();
     
     std::unique_ptr<Program>    lightProgram = Program::Create("./shader/light.vert", "./shader/light.frag");
-    std::unique_ptr<Program>    objectProgram = Program::Create("./shader/specularMap.vert", "./shader/specularMap.frag");
+    std::unique_ptr<Program>    objectProgram = Program::Create("./shader/normalMap.vert", "./shader/normalMap.frag");
 
 	// Object
 	std::unique_ptr<Object>		box = Object::CreateBox();
 	std::unique_ptr<Object>		plane = Object::CreatePlane();
 
     // Texture
-	std::unique_ptr<Texture>	texDiffuse = Texture::Load("./image/container2.png", "material.diffuse");
-    std::unique_ptr<Texture>	texSpecular = Texture::Load("./image/container2_specular.png", "material.specular");
-    objectProgram->Use();
-    objectProgram->setUniform(0, texDiffuse->GetName());
-    objectProgram->setUniform(1, texSpecular->GetName());
-    objectProgram->setUniform(64.0f, "material.shininess");
+	std::unique_ptr<Texture>	floorDiffuse = Texture::Load("./image/gravel_concrete_diff.png", "material.diffuse");
+    std::unique_ptr<Texture>	floorNormal = Texture::Load("./image/gravel_concrete_nor.png", "material.normal");
+    std::unique_ptr<Texture>	boxDiffuse = Texture::Load("./image/stone_wall_diff.png", "material.diffuse");
+    std::unique_ptr<Texture>	boxNormal = Texture::Load("./image/stone_wall_nor.png", "material.normal");
 
     // Camera
     double  x, y;
@@ -91,7 +89,7 @@ int main_process()
         glm::mat4   view = camera->getView(width / height);
         
         // Lighting Box
-        glm::vec3   lightPos = glm::vec3(0.0f, 4.0f, 0.0f);
+        glm::vec3   lightPos = glm::vec3(0.0f, 8.0f, 0.0f);
         lightProgram->Use();
         glm::mat4   model = MathOP::translate(glm::mat4(1.0f), lightPos);
         model = MathOP::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
@@ -115,7 +113,7 @@ int main_process()
         glm::vec3   lightDir = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f));
         objectProgram->setUniform(lightDir, "directionLight.direction");
         objectProgram->setUniform(ambient, "directionLight.ambient");
-        objectProgram->setUniform(glm::vec3(0.2f, 0.2f, 0.2f), "directionLight.diffuse");
+        objectProgram->setUniform(glm::vec3(0.1f, 0.1f, 0.1f), "directionLight.diffuse");
         objectProgram->setUniform(specular, "directionLight.specular");
         
         // Spot Light
@@ -130,18 +128,26 @@ int main_process()
         // View Pos
         objectProgram->setUniform(view, "view");
         objectProgram->setUniform(camera->getPosition(), "viewPos");
-        texDiffuse->bind(0);
-        texSpecular->bind(1);
 
         // Floor
         model = MathOP::scale(glm::mat4(1.0f), glm::vec3(30.0f, 1.0f, 30.0f));
         model = MathOP::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        floorDiffuse->bind(0);
+        floorNormal->bind(1);
+        objectProgram->setUniform(0, floorDiffuse->GetName());
+        objectProgram->setUniform(1, floorNormal->GetName());
+        objectProgram->setUniform(64.0f, "material.shininess");
         objectProgram->setUniform(model, "model");
 		plane->Draw();
 
         // Object Box
         GLfloat     angle = glfwGetTime();
         model = MathOP::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, -2.0f));
+        boxDiffuse->bind(0);
+        boxNormal->bind(1);
+        objectProgram->setUniform(0, boxDiffuse->GetName());
+        objectProgram->setUniform(1, boxNormal->GetName());
+        objectProgram->setUniform(64.0f, "material.shininess");
         objectProgram->setUniform(model, "model");
 		box->Draw();
 
