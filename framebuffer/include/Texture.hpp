@@ -45,7 +45,7 @@ std::unique_ptr<Texture>    Texture::Create(const float& width, const float& hei
     std::unique_ptr<Texture>	texture = std::unique_ptr<Texture>(new Texture());
     texture->init(TextureTarget);
     texture->SetTexImage(width, height, format, nullptr);
-    texture->SetWrap(GL_LINEAR, GL_LINEAR);
+    texture->SetFliter(GL_LINEAR, GL_LINEAR);
 	return (std::move(texture));
 }
 
@@ -54,6 +54,8 @@ std::unique_ptr<Texture>    Texture::Load(const std::filesystem::path& filePath,
 {
     std::unique_ptr<Texture>	texture = std::unique_ptr<Texture>(new Texture());
     texture->init(TextureTarget);
+    texture->SetWrap(GL_REPEAT, GL_REPEAT);
+    texture->SetFliter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
     texture->LoadFile(filePath, name);
 	return (std::move(texture));
 };
@@ -74,8 +76,6 @@ void    Texture::init(GLenum TextureTarget)
     this->target = TextureTarget;
 	glGenTextures(1, &this->id);
 	glBindTexture(this->target, this->id);
-    SetWrap(GL_REPEAT, GL_REPEAT);
-    SetFliter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 };
 
 void    Texture::LoadFile(const std::filesystem::path& filePath, std::string name)

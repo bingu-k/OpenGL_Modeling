@@ -61,6 +61,10 @@ int main_process()
     
     std::unique_ptr<Program>    lightProgram = Program::Create("./shader/light.vert", "./shader/light.frag");
     std::unique_ptr<Program>    textureProgram = Program::Create("./shader/texture.vert", "./shader/texture.frag");
+    std::unique_ptr<Program>    FBProgram = Program::Create("./shader/framebuffer.vert", "./shader/framebuffer.frag");
+    std::unique_ptr<Program>    InverseProgram = Program::Create("./shader/framebuffer.vert", "./shader/inverse.frag");
+    std::unique_ptr<Program>    grayProgram = Program::Create("./shader/framebuffer.vert", "./shader/grayscale.frag");
+    std::unique_ptr<Program>    KEProgram = Program::Create("./shader/framebuffer.vert", "./shader/kernel_effect.frag");
 
 	// Object
 	std::unique_ptr<Object>		box = Object::CreateBox();
@@ -72,7 +76,16 @@ int main_process()
     std::unique_ptr<Texture>    wall = Texture::Load("./image/container2.png", "tex");
 	
     // FrameBuffer
-    std::unique_ptr<FrameBuffer>    framebuffer = FrameBuffer::Create(Texture::Create(width, height, GL_RGBA));
+    std::unique_ptr<FrameBuffer>    framebuffer = FrameBuffer::Create(Texture::Create(width, height, GL_RGB));
+    
+    FBProgram->Use();
+    FBProgram->setUniform(0, "screenTexture");
+    InverseProgram->Use();
+    InverseProgram->setUniform(0, "screenTexture");
+    grayProgram->Use();
+    grayProgram->setUniform(0, "screenTexture");
+    KEProgram->Use();
+    KEProgram->setUniform(0, "screenTexture");
 
     // Camera
     double  x, y;
@@ -88,27 +101,19 @@ int main_process()
         key_manager(window);
 
         framebuffer->bind();
+        glEnable(GL_DEPTH_TEST);
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        glm::mat4   view = camera->getView(width / height);
-        
-        // Lighting Box
-        glm::vec3   lightPos = glm::vec3(0.0f, 8.0f, 0.0f);
-        lightProgram->Use();
-        glm::mat4   model = MathOP::translate(glm::mat4(1.0f), lightPos);
-        model = MathOP::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-        lightProgram->setUniform(view * model, "transform");
-        box->Draw();
 
         // View Pos
+        glm::mat4   view = camera->getView(width / height);
         textureProgram->setUniform(view, "view");
         textureProgram->setUniform(camera->getPosition(), "viewPos");
         
         // floor
         textureProgram->Use();
-        model = MathOP::scale(glm::mat4(1.0f), glm::vec3(30.0f, 1.0f, 30.0f));
+        glm::mat4   model = MathOP::scale(glm::mat4(1.0f), glm::vec3(30.0f, 1.0f, 30.0f));
         model = MathOP::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         textureProgram->setUniform(view * model, "transform");
         floor->bind(0);
@@ -122,16 +127,37 @@ int main_process()
         textureProgram->setUniform(0, wall->GetName());
         box->Draw();
 
-        // Frame Buffer
-        framebuffer->bindDefault();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindVertexArray(0);
 
-        textureProgram->Use();
-        textureProgram->setUniform(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f)), "transform");
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDisable(GL_DEPTH_TEST);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         framebuffer->GetColorAttachment()->bind_();
-        textureProgram->setUniform(0, "tex");
-        plane->Draw();
+        // Basic Framebuffer
+        FBProgram->Use();
+        glm::mat4   transform = MathOP::translate(glm::mat4(1.0f), glm::vec3(-0.5f, 0.5f, 0.0f));
+        FBProgram->setUniform(transform, "transform");
+        screen->Draw();
 
+        // Inverse Framebuffer
+        InverseProgram->Use();
+        transform = MathOP::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.0f));
+        InverseProgram->setUniform(transform, "transform");
+        screen->Draw();
+
+        // Gray Scale Framebuffer
+        grayProgram->Use();
+        transform = MathOP::translate(glm::mat4(1.0f), glm::vec3(-0.5f, -0.5f, 0.0f));
+        grayProgram->setUniform(transform, "transform");
+        screen->Draw();
+
+        // Kernel Effect Framebuffer
+        KEProgram->Use();
+        transform = MathOP::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
+        KEProgram->setUniform(transform, "transform");
+        screen->Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
