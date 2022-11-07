@@ -38,7 +38,7 @@ struct Material
 	float		shininess;
 };
 
-uniform bool             lightswitch[3];
+uniform bool            lightswitch[3];
 uniform PointLight		pointLight;
 uniform DirectionLight	directionLight;
 uniform SpotLight		spotLight;

@@ -78,7 +78,29 @@ int main_process()
     camera->setCameraFront(-90.0f, -30.0f);
 	glfwSetWindowUserPointer(window, camera.get());
 
-    // 렌더링 루프
+
+    // Lighting Set
+    objectProgram->Use();
+    objectProgram->setUniform(false, "lightswitch[0]");
+    objectProgram->setUniform(false, "lightswitch[1]");
+    objectProgram->setUniform(false, "lightswitch[2]");
+
+    // Point Light(고정적)
+    glm::vec3   lightPos = glm::vec3(-2.0f, 2.0f, -2.0f);
+    glm::vec3   ambient{0.05f, 0.05f, 0.05f}, diffuse{0.5f, 0.5f, 0.5f}, specular{1.0f, 1.0f, 1.0f};
+    auto    Plight = Light::CreatePointLight(lightPos, ambient, diffuse, specular);
+    Plight->setUniform(objectProgram.get());
+    
+    // Direction Light(고정적)
+    glm::vec3   lightDir = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f));
+    auto    Dlight = Light::CreateDirectionLight(lightDir, ambient, glm::vec3(0.1f, 0.1f, 0.1f), specular);
+    Dlight->setUniform(objectProgram.get());
+
+    // Spot Light
+    glm::vec2   cutoff{cos(glm::radians(12.5f)), cos(glm::radians(15.0f))};
+    auto    Slight = Light::CreateSpotLight(camera->getPosition(), ambient, diffuse, specular,
+                                            camera->getFront(), cutoff);
+
     while (!glfwWindowShouldClose(window))
     {
         key_manager(window);
@@ -89,43 +111,19 @@ int main_process()
         glm::mat4   view = camera->getView(width / height);
         
         // Lighting Box
-        glm::vec3   lightPos = glm::vec3(0.0f, 8.0f, 0.0f);
         lightProgram->Use();
         glm::mat4   model = MathOP::translate(glm::mat4(1.0f), lightPos);
         model = MathOP::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
         lightProgram->setUniform(view * model, "transform");
         box->Draw();
 
-        // Lighting Component
-        objectProgram->Use();
-        objectProgram->setUniform(true, "lightswitch[0]");
-        objectProgram->setUniform(true, "lightswitch[1]");
-        objectProgram->setUniform(true, "lightswitch[2]");
-
-        // Point Light
-        glm::vec3   ambient{0.05f, 0.05f, 0.05f}, diffuse{0.5f, 0.5f, 0.5f}, specular{1.0f, 1.0f, 1.0f};
-        objectProgram->setUniform(lightPos, "pointLight.position");
-        objectProgram->setUniform(ambient, "pointLight.ambient");
-        objectProgram->setUniform(diffuse, "pointLight.diffuse");
-        objectProgram->setUniform(specular, "pointLight.specular");
-        
-        // Direction Light
-        glm::vec3   lightDir = glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f));
-        objectProgram->setUniform(lightDir, "directionLight.direction");
-        objectProgram->setUniform(ambient, "directionLight.ambient");
-        objectProgram->setUniform(glm::vec3(0.1f, 0.1f, 0.1f), "directionLight.diffuse");
-        objectProgram->setUniform(specular, "directionLight.specular");
-        
-        // Spot Light
-        glm::vec2   cutoff{cos(glm::radians(12.5f)), cos(glm::radians(15.0f))};
-        objectProgram->setUniform(camera->getPosition(), "spotLight.position");
-        objectProgram->setUniform(camera->getFront(), "spotLight.direction");
-        objectProgram->setUniform(cutoff, "spotLight.cutoff");
-        objectProgram->setUniform(ambient, "spotLight.ambient");
-        objectProgram->setUniform(diffuse, "spotLight.diffuse");
-        objectProgram->setUniform(specular, "spotLight.specular");
+        // Spot Light(유동적)
+        Slight->setPos(camera->getPosition());
+        Slight->setDir(camera->getFront());
+        Slight->setUniform(objectProgram.get());
 
         // View Pos
+        objectProgram->Use();
         objectProgram->setUniform(view, "view");
         objectProgram->setUniform(camera->getPosition(), "viewPos");
 

@@ -11,8 +11,7 @@ class Light
 {
 public:
     static std::unique_ptr<Light>    CreatePointLight(const glm::vec3& pos, const glm::vec3& ambient,
-                                                    const glm::vec3& diffuse, const glm::vec3& specular,
-                                                    const float& distance);
+                                                    const glm::vec3& diffuse, const glm::vec3& specular);
     static std::unique_ptr<Light>    CreateDirectionLight(const glm::vec3& dir, const glm::vec3& ambient,
                                                         const glm::vec3& diffuse, const glm::vec3& specular);
     static std::unique_ptr<Light>    CreateSpotLight(const glm::vec3& pos, const glm::vec3& ambient,
@@ -25,10 +24,8 @@ public:
     { this->LightType = type; };
     void    setPos(const glm::vec3& pos)
     { this->pos = pos; };
-    void    setDistance(const float& distance)
-    { this->distance = distance; };
     void    setDir(const glm::vec3& dir)
-    { this->dir = dir; this->directional = true; };
+    { this->dir = dir; };
     void    setCutoff(const glm::vec2& cutoff)
     { this->cutoff = cutoff; };
     void    setLightComponent(const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular)
@@ -43,10 +40,8 @@ private:
     glm::vec3   diffuse{ glm::vec3(0.0f, 0.0f, 0.0f) };
     glm::vec3   specular{ glm::vec3(0.0f, 0.0f, 0.0f) };
 
-    bool        directional{ false };
     glm::vec3   dir{ glm::vec3(0.0f, 0.0f, 0.0f) };
 
-    float       distance {0.0f};
     glm::vec2   cutoff{ glm::vec2(0.0f, 0.0f) };
 
     Light() {};
@@ -56,13 +51,11 @@ private:
 };
 
 std::unique_ptr<Light>   Light::CreatePointLight(const glm::vec3& pos, const glm::vec3& ambient,
-                                                const glm::vec3& diffuse, const glm::vec3& specular,
-                                                const float& distance)
+                                                const glm::vec3& diffuse, const glm::vec3& specular)
 {
     std::unique_ptr<Light>  light = std::unique_ptr<Light>(new Light());
     light->setLightType(POINT);
     light->setPos(pos);
-    light->setDistance(distance);
     light->setLightComponent(ambient, diffuse, specular);
     return (std::move(light));
 };
@@ -95,32 +88,38 @@ void    Light::setUniform(Program* program)
     if (this->LightType == POINT)
         this->setPointUniform(program);
     else if (this->LightType == DIRECTION)
-        this->setPointUniform(program);
+        this->setDirectionUniform(program);
     else if (this->LightType == SPOT)
-        this->setPointUniform(program);
+        this->setSpotUniform(program);
 };
 
 void    Light::setPointUniform(Program* program)
 {
-    program->setUniform(this->pos, "PointLight.position");
-    program->setUniform(this->ambient, "PointLight.ambient");
-    program->setUniform(this->diffuse, "PointLight.diffuse");
-    program->setUniform(this->specular, "PointLight.specular");
+    program->Use();
+    program->setUniform(true, "lightswitch[0]");
+    program->setUniform(this->pos, "pointLight.position");
+    program->setUniform(this->ambient, "pointLight.ambient");
+    program->setUniform(this->diffuse, "pointLight.diffuse");
+    program->setUniform(this->specular, "pointLight.specular");
 };
 void    Light::setDirectionUniform(Program* program)
 {
-    program->setUniform(this->dir, "DirectionLight.direction");
-    program->setUniform(this->ambient, "DirectionLight.ambient");
-    program->setUniform(this->diffuse, "DirectionLight.diffuse");
-    program->setUniform(this->specular, "DirectionLight.specular");
+    program->Use();
+    program->setUniform(true, "lightswitch[1]");
+    program->setUniform(this->dir, "directionLight.direction");
+    program->setUniform(this->ambient, "directionLight.ambient");
+    program->setUniform(this->diffuse, "directionLight.diffuse");
+    program->setUniform(this->specular, "directionLight.specular");
 };
 void    Light::setSpotUniform(Program* program)
 {
-    program->setUniform(this->pos, "SpotLight.position");
-    program->setUniform(this->dir, "SpotLight.direction");
-    program->setUniform(this->cutoff, "SpotLight.cutoff");
-    program->setUniform(this->ambient, "SpotLight.ambient");
-    program->setUniform(this->diffuse, "SpotLight.diffuse");
-    program->setUniform(this->specular, "SpotLight.specular");
+    program->Use();
+    program->setUniform(true, "lightswitch[2]");
+    program->setUniform(this->pos, "spotLight.position");
+    program->setUniform(this->dir, "spotLight.direction");
+    program->setUniform(this->cutoff, "spotLight.cutoff");
+    program->setUniform(this->ambient, "spotLight.ambient");
+    program->setUniform(this->diffuse, "spotLight.diffuse");
+    program->setUniform(this->specular, "spotLight.specular");
 };
 #endif
