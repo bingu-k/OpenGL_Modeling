@@ -6,6 +6,7 @@
 #include "../include/Light.hpp"
 #include "../include/Object.hpp"
 #include "../include/MathOP.hpp"
+#include "../include/Model.hpp"
 
 using namespace std;
 
@@ -65,11 +66,15 @@ int main_process()
     std::unique_ptr<Program>    InverseProgram = Program::Create("./shader/framebuffer.vert", "./shader/inverse.frag");
     std::unique_ptr<Program>    grayProgram = Program::Create("./shader/framebuffer.vert", "./shader/grayscale.frag");
     std::unique_ptr<Program>    KEProgram = Program::Create("./shader/framebuffer.vert", "./shader/kernel_effect.frag");
+    std::unique_ptr<Program>    modelProgram = Program::Create("./shader/model.vert", "./shader/model.frag");
 
 	// Object
 	std::unique_ptr<Object>		box = Object::CreateBox();
 	std::unique_ptr<Object>		plane = Object::CreatePlane();
 	std::unique_ptr<Object>		screen = Object::CreateScreen();
+
+    // Model
+    std::unique_ptr<Model>      backpack = Model::LoadModel("./image/backpack/backpack.obj");
 
     // Texture
     std::unique_ptr<Texture>    floor = Texture::Load("./image/stone_wall_diff.png", "tex");
@@ -111,7 +116,7 @@ int main_process()
         textureProgram->setUniform(view, "view");
         textureProgram->setUniform(camera->getPosition(), "viewPos");
         
-        // floor
+        // Floor
         textureProgram->Use();
         glm::mat4   model = MathOP::scale(glm::mat4(1.0f), glm::vec3(30.0f, 1.0f, 30.0f));
         model = MathOP::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -120,12 +125,11 @@ int main_process()
         textureProgram->setUniform(0, floor->GetName());
         plane->Draw();
 
-        // box
+        // Model
+        modelProgram->Use();
         model = MathOP::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, -2.0f));
-        textureProgram->setUniform(view * model, "transform");
-        wall->bind(0);
-        textureProgram->setUniform(0, wall->GetName());
-        box->Draw();
+        modelProgram->setUniform(view * model, "transform");
+        backpack->draw(modelProgram.get());
 
         glBindVertexArray(0);
 

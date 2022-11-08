@@ -6,6 +6,7 @@
 #include "../include/Light.hpp"
 #include "../include/Object.hpp"
 #include "../include/MathOP.hpp"
+#include "../include/Model.hpp"
 
 using namespace std;
 
@@ -66,6 +67,9 @@ int main_process()
 	std::unique_ptr<Object>		box = Object::CreateBox();
 	std::unique_ptr<Object>		plane = Object::CreatePlane();
 	std::unique_ptr<Object>		screen = Object::CreateScreen();
+
+    // Model
+    std::unique_ptr<Model>      backpack = Model::LoadModel("./image/backpack/backpack.obj");
 
     // Texture
 	std::unique_ptr<Texture>	floorDiffuse = Texture::Load("./image/gravel_concrete_diff.png", "material.diffuse");
@@ -160,6 +164,12 @@ int main_process()
         objectProgram->setUniform(64.0f, "material.shininess");
         objectProgram->setUniform(model, "model");
 		box->Draw();
+        
+        // Model
+        model = MathOP::translate(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, -2.0f));
+        objectProgram->setUniform(64.0f, "material.shininess");
+        objectProgram->setUniform(model, "model");
+        backpack->draw(objectProgram.get());
 
         glBindVertexArray(0);
 

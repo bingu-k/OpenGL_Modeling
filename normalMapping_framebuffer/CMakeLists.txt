@@ -83,6 +83,30 @@ ExternalProject_Add(
 
 set(DEP_LIST ${DEP_LIST} dep_glm)
 
+ExternalProject_Add(
+    dep_assimp
+    GIT_REPOSITORY      "https://github.com/assimp/assimp.git"
+    GIT_TAG             "v5.2.5"
+    GIT_SHALLOW         1
+    UPDATE_COMMAND      ""
+    PATCH_COMMAND       ""
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+        -DBUILD_SHARED_LIBS=OFF
+        -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+        -DASSIMP_BUILD_TESTS=OFF
+        -DASSIMP_INJECT_DEBUG_POSTFIX=OFF
+        -DASSIMP_BUILD_ZLIB=ON
+    TEST_COMMAND        ""
+    )
+
+set(DEP_LIST ${DEP_LIST} dep_assimp)
+set(DEP_LIBS ${DEP_LIBS}
+    assimp-vc143-mt
+    zlibstaticd
+#    IrrXML$<$<CONFIG:Debug>:d>
+)
+
 # include / lib 관련 옵션 추가
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${DEP_INCLUDE_DIR}
