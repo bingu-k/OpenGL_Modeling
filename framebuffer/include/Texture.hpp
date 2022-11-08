@@ -22,7 +22,6 @@ public:
     { return (this->height); };
 
 	void	bind(unsigned int idx);
-	void	bind_(void);
 private:
     GLuint      id { 0 };
     std::string name { "" };
@@ -63,11 +62,6 @@ std::unique_ptr<Texture>    Texture::Load(const std::filesystem::path& filePath,
 void	Texture::bind(unsigned int idx)
 {
 	glActiveTexture(GL_TEXTURE0 + idx);
-	glBindTexture(this->target, this->id);
-};
-
-void	Texture::bind_(void)
-{
 	glBindTexture(this->target, this->id);
 };
 

@@ -134,7 +134,7 @@ int main_process()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        framebuffer->GetColorAttachment()->bind_();
+        framebuffer->GetColorAttachment()->bind(0);
         // Basic Framebuffer
         FBProgram->Use();
         glm::mat4   transform = MathOP::translate(glm::mat4(1.0f), glm::vec3(-0.5f, 0.5f, 0.0f));
