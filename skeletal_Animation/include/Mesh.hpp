@@ -11,6 +11,7 @@ struct mVertex
     glm::vec3   position;
     glm::vec3   normal;
     glm::vec2   texCoords;
+    glm::vec3   tangent;
     int         boneIDs[MAX_BONE_INFLUENCE];
     float       weights[MAX_BONE_INFLUENCE];
 };
@@ -79,9 +80,11 @@ void    Mesh::setupMesh()
     glEnableVertexAttribArray(2);	
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(mVertex), (void*)offsetof(mVertex, texCoords));
     glEnableVertexAttribArray(3);	
-    glVertexAttribIPointer(3, 4, GL_INT, sizeof(mVertex), (void*)offsetof(mVertex, boneIDs));
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(mVertex), (void*)offsetof(mVertex, weights));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(mVertex), (void*)offsetof(mVertex, tangent));
+    glEnableVertexAttribArray(4);	
+    glVertexAttribIPointer(4, 4, GL_INT, sizeof(mVertex), (void*)offsetof(mVertex, boneIDs));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(mVertex), (void*)offsetof(mVertex, weights));
 
     glBindVertexArray(0);
 };

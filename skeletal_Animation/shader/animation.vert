@@ -3,8 +3,9 @@
 layout (location = 0) in vec3   aPosition;
 layout (location = 1) in vec3   aNormal;
 layout (location = 2) in vec2   aTexCoord;
-layout (location = 3) in ivec4  boneIds;
-layout (location = 4) in vec4   weights;
+layout (location = 3) in vec3   aTangent;
+layout (location = 4) in ivec4  boneIds;
+layout (location = 5) in vec4   weights;
 
 out vec2    TexCoords;
 

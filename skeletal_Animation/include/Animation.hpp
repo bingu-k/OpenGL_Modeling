@@ -3,7 +3,7 @@
 
 #include "Common.hpp"
 #include "Bone.hpp"
-#include "Model.hpp"
+#include "AniModel.hpp"
 #include <functional>
 
 struct AssimpNodeData
@@ -18,7 +18,7 @@ class Animation
 {
 public:
     Animation() = default;
-    Animation(const std::string& animationPath, Model* model);
+    Animation(const std::string& animationPath, AniModel* model);
     ~Animation() {};
 
     Bone*   FindBone(const std::string& name);
@@ -35,11 +35,11 @@ private:
     AssimpNodeData      rootNode;
     std::map<std::string, BoneInfo> boneInfoMap;
 
-    void    ReadMissingBones(const aiAnimation* animation, Model& model);
+    void    ReadMissingBones(const aiAnimation* animation, AniModel& model);
     void    ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
 };
 
-Animation::Animation(const std::string& animationPath, Model* model)
+Animation::Animation(const std::string& animationPath, AniModel* model)
 {
     Assimp::Importer    importer;
     const aiScene*      scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -65,7 +65,7 @@ Bone*   Animation::FindBone(const std::string& name)
         return &(*iter);
 };
 
-void    Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
+void    Animation::ReadMissingBones(const aiAnimation* animation, AniModel& model)
 {
     int     size = animation->mNumChannels;
     auto&   tmpBoneInfoMap = model.GetBoneInfoMap();

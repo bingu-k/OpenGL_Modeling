@@ -72,7 +72,7 @@ void    Camera::turnCamera(const float& xPos, const float& yPos)
 
 void    Camera::moveCamera(GLFWwindow *window)
 {
-    const float Vel = 0.1;
+    const float Vel = 0.05;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         pos += Vel * front;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

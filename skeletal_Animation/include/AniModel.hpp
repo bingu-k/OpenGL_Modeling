@@ -1,5 +1,5 @@
-#ifndef MODEL_HPP
-#define MODEL_HPP
+#ifndef ANIMODEL_HPP
+#define ANIMODEL_HPP
 
 #include "Common.hpp"
 #include "Program.hpp"
@@ -17,12 +17,12 @@ struct  BoneInfo
     glm::mat4   offset;
 };
 
-class Model
+class AniModel
 {
 public:
-    static std::unique_ptr<Model>   LoadModel(const std::string& path);
+    static std::unique_ptr<AniModel>   LoadModel(const std::string& path);
 
-    ~Model() {};
+    ~AniModel() {};
     void    draw(Program* program);
 
     auto&   GetBoneInfoMap(void) { return (this->boneInfoMap); };
@@ -36,7 +36,7 @@ private:
     std::map<std::string, BoneInfo> boneInfoMap;
     int                             boneCount{ 0 };
 
-    Model() {};
+    AniModel() {};
     void    init(const std::string& path);
     void    processNode(aiNode* node, const aiScene* scene);
     Mesh    processMesh(aiMesh* mesh, const aiScene* scene);
@@ -47,20 +47,20 @@ private:
     void    ExtractBoneWeightForVertices(std::vector<mVertex>& vertices, aiMesh* mesh, const aiScene* scene);
 };
 
-std::unique_ptr<Model>   Model::LoadModel(const std::string& path)
+std::unique_ptr<AniModel>   AniModel::LoadModel(const std::string& path)
 {
-    std::unique_ptr<Model>  model = std::unique_ptr<Model>(new Model());
+    std::unique_ptr<AniModel>  model = std::unique_ptr<AniModel>(new AniModel());
     model->init(path);
     return (std::move(model));
 };
 
-void    Model::draw(Program* program)
+void    AniModel::draw(Program* program)
 {
     for (auto& mesh : this->meshes)
         mesh.Draw(program);
 };
 
-void    Model::init(const std::string& path)
+void    AniModel::init(const std::string& path)
 {
     Assimp::Importer    import;
     const aiScene*  scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
@@ -71,7 +71,7 @@ void    Model::init(const std::string& path)
     processNode(scene->mRootNode, scene);
 };
 
-void    Model::processNode(aiNode* node, const aiScene* scene)
+void    AniModel::processNode(aiNode* node, const aiScene* scene)
 {
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
@@ -82,7 +82,7 @@ void    Model::processNode(aiNode* node, const aiScene* scene)
         processNode(node->mChildren[i], scene);
 };
 
-Mesh    Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Mesh    AniModel::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<mVertex>    vertices;
     std::vector<GLuint>     indices;
@@ -103,6 +103,7 @@ Mesh    Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vec.x = mesh->mTextureCoords[0][i].x; 
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.texCoords = vec;
+            vertex.tangent = AssimpGLMHelpers::GetGLMVec(mesh->mTangents[0]);
         }
         else
             vertex.texCoords = glm::vec2(0.0f, 0.0f);
@@ -132,7 +133,7 @@ Mesh    Model::processMesh(aiMesh* mesh, const aiScene* scene)
     return (Mesh(vertices, indices, textures));
 };
 
-std::vector<mTexture>   Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+std::vector<mTexture>   AniModel::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
 {
     std::vector<mTexture>   textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
@@ -203,7 +204,7 @@ unsigned int    TextureFromFile(const char *path, const std::string &directory, 
     return (textureID);
 };
 
-void    Model::SetVertexBoneDataDefault(mVertex& vertex)
+void    AniModel::SetVertexBoneDataDefault(mVertex& vertex)
 {
     for (unsigned int i = 0; i < MAX_BONE_INFLUENCE; ++i)
     {
@@ -212,7 +213,7 @@ void    Model::SetVertexBoneDataDefault(mVertex& vertex)
     }
 };
 
-void    Model::SetVertexBoneData(mVertex& vertex, int boneID, float weight)
+void    AniModel::SetVertexBoneData(mVertex& vertex, int boneID, float weight)
 {
     for (unsigned int i = 0; i < MAX_BONE_INFLUENCE; ++i)
     {
@@ -225,7 +226,7 @@ void    Model::SetVertexBoneData(mVertex& vertex, int boneID, float weight)
     }
 };
 
-void    Model::ExtractBoneWeightForVertices(std::vector<mVertex>& vertices, aiMesh* mesh, const aiScene* scene)
+void    AniModel::ExtractBoneWeightForVertices(std::vector<mVertex>& vertices, aiMesh* mesh, const aiScene* scene)
 {
     for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
     {
